@@ -73,7 +73,13 @@ const login = async (v) => {
   } catch (error) {
     Alert.alert(
       "Warning",
-      "Internet connection is not stable.\n Try again later."
+      "Internet connection is not stable.\n Try again later.",
+      [
+        {
+          text: "ok",
+          onPress: () => setloading(false),
+        },
+      ]
     );
   }
 };
@@ -88,7 +94,7 @@ const handlesearch = (e, setvalue, origin, setinfo) => {
   );
 };
 
-const handle = async (setorigin, setinfo,size=10) => {
+const handle = async (setorigin, setinfo, size = 10) => {
   try {
     const { granted } = await Contacts.requestPermissionsAsync();
     if (!granted) return;
@@ -116,12 +122,16 @@ const addtochats = async (v, user, setloading, setvisible) => {
     setloading(true);
     const res = await getbookednums();
     const trimmed = v.replace(/\D/g, "");
-
     if (res.findIndex((i) => i === trimmed) === -1) {
-      setloading(false);
       return Alert.alert(
         "User not found",
-        "This user is not on whatsApp clone yet..."
+        "This user is not on whatsApp clone yet...",
+        [
+          {
+            text: "ok",
+            onPress: () => setloading(false),
+          },
+        ]
       );
     }
 
@@ -131,11 +141,11 @@ const addtochats = async (v, user, setloading, setvisible) => {
     db.collection(`users/${user}/chats/${trimmed}/recieved`).add({});
     db.collection(`users/${trimmed}/chats/${user}/sent`).add({});
     db.collection(`users/${trimmed}/chats/${user}/recieved`).add({});
+    setloading(false);
     return setvisible(false);
   } catch (error) {
     console.log(error);
   }
-  setloading(false);
 };
 
 const takephotopermission = async () => {

@@ -37,10 +37,15 @@ const Login = () => {
           setLoading(true);
           try {
             const res = await backendfuncs.login(v);
-            setLoading(false);
             if (!res) {
-              return Alert.alert("Error", content.errormessageifdoesnotexist);
+              return Alert.alert("Error", content.errormessageifdoesnotexist, [
+                {
+                  text: "ok",
+                  onPress: () => setloading(false),
+                },
+              ]);
             }
+            setloading(false)
             dispatch(setuser(res[0]));
           } catch (error) {
             console.log(error);

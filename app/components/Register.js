@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setuser, info } from "../redux/reducer";
 import Loading from "./Loading";
 
-const Register = ({token}) => {
+const Register = ({ token }) => {
   const [loading, setLoading] = useState(false);
   const schema = yup.object().shape({
     name: yup
@@ -27,7 +27,6 @@ const Register = ({token}) => {
     profilepic: yup.string().label("Image"),
   });
   const dispatch = useDispatch();
-  const data = useSelector(info);
   return (
     <View style={{ flex: 1, marginVertical: 10, paddingHorizontal: 10 }}>
       <Loading visible={loading} />
@@ -36,16 +35,22 @@ const Register = ({token}) => {
         initialvalues={{
           name: "",
           number: "",
-          profilepic: '',
-          token:token
+          profilepic: "",
+          token: token,
         }}
         submit={async (v) => {
           setLoading(true);
           try {
             const res = await backendfuncs.register(v);
+            if (!res.ok)
+              return Alert.alert("Error", content.errormessageifexists, [
+                {
+                  text: "ok",
+                  onPress: () => setloading(false),
+                },
+              ]);
             setLoading(false);
-            if (res.ok) return dispatch(setuser(res.data));
-            return Alert.alert("Error", content.errormessageifexists);
+            return dispatch(setuser(res.data));
           } catch (error) {
             console.log(error);
           }
