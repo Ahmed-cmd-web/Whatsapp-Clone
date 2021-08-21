@@ -11,7 +11,7 @@ import content from "../content/content";
 import colors from "../content/colors";
 import backendfuncs from "../backend/backendfuncs";
 import { useDispatch } from "react-redux";
-import {  setuser } from "../redux/reducer";
+import { setuser } from "../redux/reducer";
 import Loading from "./Loading";
 
 const Login = () => {
@@ -37,8 +37,10 @@ const Login = () => {
           try {
             const res = await backendfuncs.login(v);
             setLoading(false);
-            if (res) return dispatch(setuser(res[0]));
-            return Alert.alert("Error", content.errormessageifdoesnotexist);
+            if (!res) {
+              return Alert.alert("Error", content.errormessageifdoesnotexist);
+            }
+            return dispatch(setuser(res[0]));
           } catch (error) {
             console.log(error);
           }
