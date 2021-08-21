@@ -4,13 +4,14 @@ import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Modal,
-  ScrollView,
   Text,
   View,
   TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { colors as c } from "react-native-elements";
-import { SearchBar, ListItem } from "react-native-elements";
+import { SearchBar, ListItem, Avatar } from "react-native-elements";
 import { useSelector } from "react-redux";
 import backendfuncs from "../backend/backendfuncs";
 import colors from "../content/colors";
@@ -21,15 +22,23 @@ import Loading from "./Loading";
 const Appmodal = ({
   visible,
   setvisible,
-  origin,
+  origin: o,
   info: ind,
   chosen = null,
 }) => {
   const [info, setinfo] = useState(ind);
   const [value, setvalue] = useState("");
   const [loading, setLoading] = useState(false);
+  const [origin, setorigin] = useState(o);
+  const [size, setSize] = useState(15);
+  const [vis, setVis] = useState(false);
+  const [load, setLoad] = useState(true);
   const data = useSelector(i);
-  useEffect(() => setinfo(ind), [ind]);
+  useEffect(() => {
+    setinfo(ind);
+    setorigin(o);
+  }, [ind, o]);
+
   return (
     <Modal
       animationType="slide"
@@ -76,83 +85,139 @@ const Appmodal = ({
           </Text>
         </TouchableOpacity>
       </View>
-        <SearchBar
-          lightTheme={true}
-          round={true}
-          placeholder="Search"
-          platform="ios"
-          inputContainerStyle={{ borderRadius: 15 }}
-          containerStyle={{
-            backgroundColor: data.darkmode
-              ? colors.dark.lightblack
-              : colors.light.background,
-          }}
-          cancelButtonTitle="cancel"
-          onChangeText={(e) =>
-            backendfuncs.handlesearch(
-              e,
-              (i) => setvalue(i),
-              origin,
-              (s) => setinfo(s)
-            )
-          }
-          value={value}
-        />
-      <ScrollView
-        style={{
-          paddingBottom: 30,
+      <SearchBar
+        lightTheme={true}
+        round={true}
+        placeholder="Search"
+        platform="ios"
+        inputContainerStyle={{ borderRadius: 15 }}
+        containerStyle={{
           backgroundColor: data.darkmode
             ? colors.dark.lightblack
             : colors.light.background,
         }}
-      >
-        {info?.map((l, i) => {
-          return (
-            <ListItem
-              key={i}
-              onPress={() => {
-                if (l.phoneNumbers) {
-                  if (chosen) return chosen(l);
-                  return backendfuncs.addtochats(
-                    l.phoneNumbers[0].number,
-                    data?.user[0]?.number,
-                    (e) => setLoading(e),
-                    (i) => setvisible(i)
-                  );
-                }
-                return;
-              }}
-              bottomDivider
-              containerStyle={{
-                backgroundColor: data.darkmode
-                  ? colors.dark.lightblack
-                  : colors.light.background,
-              }}
-              style={{ paddingHorizontal: 30 }}
-            >
-              {l.imageAvailable && <Avatar source={{ uri: l.image }} />}
-              <ListItem.Content>
-                <ListItem.Title
-                  style={{
-                    color: data.darkmode
-                      ? colors.dark.white
-                      : colors.light.black,
-                  }}
-                >
-                  {l.name
-                    ? l.name
-                    : l.phoneNumbers
-                    ? l.phoneNumbers[0].number
-                    : l.id}
-                </ListItem.Title>
-                <ListItem.Subtitle style={{ color: c.greyOutline }}>
-                  {l.phoneNumbers ? l.phoneNumbers[0].number : l.id}
-                </ListItem.Subtitle>
-              </ListItem.Content>
-            </ListItem>
+        cancelButtonTitle="cancel"
+        onBlur={() => setLoad(true)}
+        onCancel={() => setLoad(true)}
+        onChangeText={(e) => {
+          setLoad(false);
+          backendfuncs.handlesearch(
+            e,
+            (i) => setvalue(i),
+            origin,
+            (s) => setinfo(s)
           );
-        })}
-      </ScrollView>
+        }}
+        value={value}
+      />
+
+      <FlatList
+        contentContainerStyle={{ paddingBottom: 50 }}
+        style={{
+          backgroundColor: data.darkmode
+            ? colors.dark.lightblack
+            : colors.light.background,
+        }}
+        onEndReached={() => {
+          if (!load) return;
+          setVis(true);
+          setSize(size + 10);
+          backendfuncs.handle(
+            (i) => setorigin(i),
+            (i) => setinfo(i),
+            size
+          );
+        }}
+        onContentSizeChange={() => setVis(false)}
+        onScrollBeginDrag={() => setVis(false)}
+        onEndReachedThreshold={0}
+        data={info}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => {
+          try {
+            if (!item) return;
+            return (
+              <ListItem
+                onPress={() => {
+                  if (item?.phoneNumbers) {
+                    if (chosen) return chosen(item);
+                    return backendfuncs.addtochats(
+                      item?.phoneNumbers[0]?.number,
+                      data?.user[0]?.number,
+                      (e) => setLoading(e),
+                      (i) => setvisible(i)
+                    );
+                  }
+                  return;
+                }}
+                bottomDivider
+                containerStyle={{
+                  backgroundColor: data.darkmode
+                    ? colors.dark.lightblack
+                    : colors.light.background,
+                }}
+                style={{ paddingHorizontal: 30 }}
+              >
+                {item.imageAvailable ? (
+                  <Avatar
+                    source={{
+                      uri: item.image,
+                    }}
+                    rounded={true}
+                    size={55}
+                    imageProps={{ resizeMode: "cover" }}
+                  />
+                ) : (
+                  <Avatar
+                    rounded
+                    containerStyle={{ height: 60, width: 65 }}
+                    icon={{
+                      name: "account-circle",
+                      type: "materialcommunityicons",
+                      color: colors.light.grey,
+                      size: 65,
+                    }}
+                  />
+                )}
+                <ListItem.Content>
+                  <ListItem.Title
+                    style={{
+                      color: data.darkmode
+                        ? colors.dark.white
+                        : colors.light.black,
+                    }}
+                  >
+                    {item?.name
+                      ? item?.name
+                      : item?.phoneNumbers
+                      ? item?.phoneNumbers[0]?.number
+                      : item?.id}
+                  </ListItem.Title>
+                  <ListItem.Subtitle style={{ color: c.greyOutline }}>
+                    {item?.phoneNumbers
+                      ? item?.phoneNumbers[0]?.number
+                      : item?.id}
+                  </ListItem.Subtitle>
+                </ListItem.Content>
+              </ListItem>
+            );
+          } catch (error) {
+            console.log(error);
+          }
+        }}
+      />
+      {vis && (
+        <ActivityIndicator
+          size="large"
+          style={{
+            alignSelf: "center",
+            width: "100%",
+            backgroundColor: data.darkmode
+              ? colors.dark.lightblack
+              : colors.light.background,
+          }}
+        />
+      )}
     </Modal>
   );
 };

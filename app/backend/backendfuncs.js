@@ -88,11 +88,13 @@ const handlesearch = (e, setvalue, origin, setinfo) => {
   );
 };
 
-const handle = async (setorigin, setinfo) => {
+const handle = async (setorigin, setinfo,size=10) => {
   try {
     const { granted } = await Contacts.requestPermissionsAsync();
     if (!granted) return;
-    const { data } = await Contacts.getContactsAsync();
+    const { data } = await Contacts.getContactsAsync({
+      pageSize: size,
+    });
     setorigin(data);
     setinfo(data);
   } catch (error) {
@@ -341,5 +343,5 @@ export default {
   getlocation,
   imageselector,
   checktyping,
-  getusers
+  getusers,
 };

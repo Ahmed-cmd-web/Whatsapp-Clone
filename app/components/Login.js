@@ -23,6 +23,7 @@ const Login = () => {
       .label("Phone Number")
       .required(),
   });
+
   const dispatch = useDispatch();
   return (
     <View style={{ flex: 1, margin: 10 }}>
@@ -40,7 +41,7 @@ const Login = () => {
             if (!res) {
               return Alert.alert("Error", content.errormessageifdoesnotexist);
             }
-            return dispatch(setuser(res[0]));
+            dispatch(setuser(res[0]));
           } catch (error) {
             console.log(error);
           }
