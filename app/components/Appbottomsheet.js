@@ -1,11 +1,7 @@
 /** @format */
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import {
-  StyleSheet,
-  TouchableHighlight,
-  View,
-} from "react-native";
+import {  TouchableHighlight, View } from "react-native";
 import { BottomSheet, Icon, ListItem } from "react-native-elements";
 import { useSelector } from "react-redux";
 import backendfuncs from "../backend/backendfuncs";
@@ -15,17 +11,11 @@ import { info } from "../redux/reducer";
 import Appmodal from "./Appmodal";
 
 const Appbottomsheet = ({ visible, setvisisble, rec, sender }) => {
-  const styles = StyleSheet.create({
-    con: {
-      flex: data,
-    },
-  });
   const nav = useNavigation();
   const data = useSelector(info);
   const [i, setI] = useState(null);
   const [origin, setOrigin] = useState(null);
   const [vis, setVis] = useState(false);
-  const [chosen, setChosen] = useState(null);
   return (
     <BottomSheet
       isVisible={visible}
@@ -48,7 +38,6 @@ const Appbottomsheet = ({ visible, setvisisble, rec, sender }) => {
           info={i}
           origin={origin}
           chosen={(e) => {
-            console.log(e);
             backendfuncs.send(
               {
                 name: e?.name,
@@ -79,9 +68,16 @@ const Appbottomsheet = ({ visible, setvisisble, rec, sender }) => {
               if (l.title === "Contact") return setVis(true);
               return setvisisble(false);
             }}
+            style={
+              l.title === "Contacts"
+                ? null
+                : {
+                    borderBottomColor: colors.light.grey,
+                    borderBottomWidth: 0.9,
+                  }
+            }
           >
             <ListItem
-              bottomDivider
               containerStyle={{
                 flexDirection: "row",
                 height: 60,

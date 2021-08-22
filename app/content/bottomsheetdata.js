@@ -60,7 +60,7 @@ export default [
     size: 32,
   },
   {
-    title: "Contact",
+    title: "Contacts",
     icon: "user-circle",
     type: "font-awesome-5",
     onpress: async (e, rec, sender, setinfo, setorigin) => {

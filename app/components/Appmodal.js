@@ -1,6 +1,6 @@
 /** @format */
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   StyleSheet,
   Modal,
@@ -10,13 +10,13 @@ import {
   FlatList,
   ActivityIndicator,
 } from "react-native";
-import { colors as c } from "react-native-elements";
-import { SearchBar, ListItem, Avatar } from "react-native-elements";
+import { SearchBar } from "react-native-elements";
 import { useSelector } from "react-redux";
 import backendfuncs from "../backend/backendfuncs";
 import colors from "../content/colors";
 import content from "../content/content";
 import { info as i } from "../redux/reducer";
+import Appcontactitem from "./Appcontactitem";
 import Loading from "./Loading";
 
 const Appmodal = ({
@@ -33,6 +33,18 @@ const Appmodal = ({
   const [size, setSize] = useState(15);
   const [vis, setVis] = useState(false);
   const [load, setLoad] = useState(true);
+  const call = useCallback(
+    ({ item }) => (
+      <Appcontactitem
+        item={item}
+        data={data}
+        setLoading={(e) => setLoading(e)}
+        setvisible={(e) => setvisible(e)}
+        chosen={(e) => chosen(e)}
+      />
+    ),
+    [info]
+  );
   const data = useSelector(i);
   useEffect(() => {
     setinfo(ind);
@@ -130,81 +142,13 @@ const Appmodal = ({
         }}
         onContentSizeChange={() => setVis(false)}
         onScrollBeginDrag={() => setVis(false)}
-        onEndReachedThreshold={0}
+        onEndReachedThreshold={0.01}
+        initialNumToRender={7}
+        removeClippedSubviews={true}
         data={info}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => {
-          try {
-            if (!item) return;
-            return (
-              <ListItem
-                onPress={() => {
-                  if (item?.phoneNumbers) {
-                    if (chosen) return chosen(item);
-                    return backendfuncs.addtochats(
-                      item?.phoneNumbers[0]?.number,
-                      data?.user[0]?.number,
-                      (e) => setLoading(e),
-                      (i) => setvisible(i)
-                    );
-                  }
-                  return;
-                }}
-                bottomDivider
-                containerStyle={{
-                  backgroundColor: data.darkmode
-                    ? colors.dark.lightblack
-                    : colors.light.background,
-                }}
-                style={{ paddingHorizontal: 30 }}
-              >
-                {item.imageAvailable ? (
-                  <Avatar
-                    source={{
-                      uri: item.image,
-                    }}
-                    rounded={true}
-                    size={55}
-                    imageProps={{ resizeMode: "cover" }}
-                  />
-                ) : (
-                  <Avatar
-                    rounded
-                    containerStyle={{ height: 60, width: 65 }}
-                    icon={{
-                      name: "account-circle",
-                      type: "materialcommunityicons",
-                      color: colors.light.grey,
-                      size: 65,
-                    }}
-                  />
-                )}
-                <ListItem.Content>
-                  <ListItem.Title
-                    style={{
-                      color: data.darkmode
-                        ? colors.dark.white
-                        : colors.light.black,
-                    }}
-                  >
-                    {item?.name
-                      ? item?.name
-                      : item?.phoneNumbers
-                      ? item?.phoneNumbers[0]?.number
-                      : item?.id}
-                  </ListItem.Title>
-                  <ListItem.Subtitle style={{ color: c.greyOutline }}>
-                    {item?.phoneNumbers
-                      ? item?.phoneNumbers[0]?.number
-                      : item?.id}
-                  </ListItem.Subtitle>
-                </ListItem.Content>
-              </ListItem>
-            );
-          } catch (error) {
-            console.log(error);
-          }
-        }}
+        legacyImplementation={true}
+        renderItem={call}
       />
       {vis && (
         <ActivityIndicator
