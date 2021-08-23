@@ -36,16 +36,16 @@ const Login = () => {
         submit={async (v) => {
           setLoading(true);
           try {
-            const res = await backendfuncs.login(v);
+            const res = await backendfuncs.login(v, (e) => setLoading(e));
             if (!res) {
               return Alert.alert("Error", content.errormessageifdoesnotexist, [
                 {
                   text: "ok",
-                  onPress: () => setloading(false),
+                  onPress: () => setLoading(false),
                 },
               ]);
             }
-            setloading(false)
+            setLoading(false);
             dispatch(setuser(res[0]));
           } catch (error) {
             console.log(error);
@@ -55,7 +55,7 @@ const Login = () => {
         <Appinput
           name="number"
           placeholder="Phone number"
-          keyboardType="numeric"
+          keyboardType="number-pad"
           textContentType="telephoneNumber"
           leftIcon={<Icon name="mobile" size={20} color="lightgray" />}
         />

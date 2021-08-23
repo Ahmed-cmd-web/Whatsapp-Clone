@@ -41,16 +41,18 @@ const Register = ({ token }) => {
         submit={async (v) => {
           setLoading(true);
           try {
-            const res = await backendfuncs.register(v);
-            if (!res.ok)
-              return Alert.alert("Error", content.errormessageifexists, [
-                {
-                  text: "ok",
-                  onPress: () => setloading(false),
-                },
-              ]);
-            setLoading(false);
-            return dispatch(setuser(res.data));
+            const res = await backendfuncs.register(v, (e) => setLoading(e));
+            if (res) {
+              if (!res.ok)
+                return Alert.alert("Error", content.errormessageifexists, [
+                  {
+                    text: "ok",
+                    onPress: () => setLoading(false),
+                  },
+                ]);
+              setLoading(false);
+              return dispatch(setuser(res.data));
+            }
           } catch (error) {
             console.log(error);
           }
@@ -76,8 +78,8 @@ const Register = ({ token }) => {
           <Appinput
             name="number"
             textContentType="telephoneNumber"
+            keyboardType="number-pad"
             placeholder={content.phonenumberplaceholder}
-            keyboardType="numeric"
             leftIcon={<Icon name="mobile" size={20} color="lightgray" />}
           />
           <Appbutton

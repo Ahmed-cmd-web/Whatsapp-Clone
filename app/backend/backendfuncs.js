@@ -27,30 +27,43 @@ const getbookednums = async () => {
     .catch((e) => console.log(e));
   return v;
 };
-const register = async (v) => {
+const register = async (v, setloading) => {
   try {
     const res = await getbookednums();
-    if (res.findIndex((i) => i === v.number) === -1) {
-      return await db
-        .doc(`users/${v.number}`)
-        .set(v)
-        .then(() => {
-          db.doc(`users/${v.number}/chats/45`).set({});
-          return {
-            ok: true,
-            data: v,
-          };
-        })
-        .catch((e) =>
-          Alert.alert(
-            "Warning",
-            "Internet connection is not stable.\n Try again later."
-          )
-        );
+    if (!(v.number.indexOf(" ") >= 0) && /^[0-9]+$/.test(v.number)) {
+      if (res.findIndex((i) => i === v.number) === -1) {
+        return await db
+          .doc(`users/${v.number}`)
+          .set(v)
+          .then(() => {
+            db.doc(`users/${v.number}/chats/45`).set({});
+            return {
+              ok: true,
+              data: v,
+            };
+          })
+          .catch((e) =>
+            Alert.alert(
+              "Warning",
+              "Internet connection is not stable.\n Try again later."
+            )
+          );
+      }
+      return {
+        ok: false,
+      };
     }
-    return {
-      ok: false,
-    };
+    Alert.alert(
+      "Warning",
+      "Remove all spaces in the number field and check the number is written in English.",
+      [
+        {
+          text: "ok",
+          onPress: () => setloading(false),
+        },
+      ]
+    );
+    return null;
   } catch (error) {
     Alert.alert(
       "Warning",
@@ -61,15 +74,16 @@ const register = async (v) => {
 const login = async (v) => {
   try {
     const res = await getbookednums();
-    if (res.findIndex((i) => i === v.number) === -1) return false;
-    return await db
+    const index = res.findIndex((i) => i === v.number);
+    if (index === -1) return false;
+    await db
       .doc(`users/${v.number}`)
       .get()
       .then((v) => {
         data.push(v.data());
-        return data;
       })
       .catch((e) => console.log(e));
+    return data;
   } catch (error) {
     Alert.alert(
       "Warning",
@@ -122,7 +136,7 @@ const addtochats = async (v, user, setloading, setvisible) => {
     setloading(true);
     const res = await getbookednums();
     const trimmed = v.replace(/\D/g, "");
-    if (res.findIndex((i) => i === trimmed) === -1) {
+    if (res.findIndex((i) => i.replace(/\D/g, "") === trimmed) === -1) {
       return Alert.alert(
         "User not found",
         "This user is not on whatsApp clone yet...",
@@ -218,7 +232,6 @@ const stoprecording = async (rec) => {
   try {
     await rec.stopAndUnloadAsync();
     const uri = rec.getURI();
-    console.log(uri);
     Alert.alert(
       "Message",
       "Are you sure you would like to send this voicenote?",

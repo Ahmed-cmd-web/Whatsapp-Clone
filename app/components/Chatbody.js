@@ -95,12 +95,13 @@ const Chatbody = () => {
                         {
                           text: "Yes",
                           onPress: () => {
+                            dispatch(deletechat(l?.data?.number));
+                            console.log(l.data);
                             backendfuncs.deletechats(
                               l?.data?.number,
                               data?.user[0]?.number,
                               (i) => setOverlay(i)
                             );
-                            dispatch(deletechat(l?.data?.number));
                           },
                         },
                         { text: "No", onPress: () => null },

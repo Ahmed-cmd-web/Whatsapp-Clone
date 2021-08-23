@@ -1,11 +1,14 @@
 /** @format */
 
+import { useRoute } from "@react-navigation/native";
 import React from "react";
 import { StyleSheet } from "react-native";
 import { ListItem, Avatar } from "react-native-elements";
 import { colors as c } from "react-native-elements";
+import { useSelector } from "react-redux";
 import backendfuncs from "../backend/backendfuncs";
 import colors from "../content/colors";
+import { info } from "../redux/reducer";
 
 const Appcontactitem = ({
   item,
@@ -14,11 +17,25 @@ const Appcontactitem = ({
   setvisible,
   chosen = null,
 }) => {
+  const { params } = useRoute();
+  const d = useSelector(info);
   return (
     <ListItem
       onPress={() => {
         if (item?.phoneNumbers) {
-          if (chosen) return chosen(item);
+          setvisible(false);
+          if (chosen === "contact") {
+            return backendfuncs.send(
+              {
+                name: item?.name,
+                number: item?.phoneNumbers[0].number,
+                image: item?.imageAvailable && e?.image,
+              },
+              "contact",
+              params.number,
+              d
+            );
+          }
           return backendfuncs.addtochats(
             item?.phoneNumbers[0]?.number,
             data?.user[0]?.number,

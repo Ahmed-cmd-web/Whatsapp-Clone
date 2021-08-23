@@ -31,7 +31,6 @@ const Appmodal = ({
   const [loading, setLoading] = useState(false);
   const [origin, setorigin] = useState(o);
   const [size, setSize] = useState(15);
-  const [vis, setVis] = useState(false);
   const [load, setLoad] = useState(true);
   const call = useCallback(
     ({ item }) => (
@@ -40,7 +39,7 @@ const Appmodal = ({
         data={data}
         setLoading={(e) => setLoading(e)}
         setvisible={(e) => setvisible(e)}
-        chosen={(e) => chosen(e)}
+        chosen={chosen}
       />
     ),
     [info]
@@ -132,7 +131,6 @@ const Appmodal = ({
         }}
         onEndReached={() => {
           if (!load) return;
-          setVis(true);
           setSize(size + 10);
           backendfuncs.handle(
             (i) => setorigin(i),
@@ -140,8 +138,6 @@ const Appmodal = ({
             size
           );
         }}
-        onContentSizeChange={() => setVis(false)}
-        onScrollBeginDrag={() => setVis(false)}
         onEndReachedThreshold={0.01}
         initialNumToRender={7}
         removeClippedSubviews={true}
@@ -150,18 +146,6 @@ const Appmodal = ({
         legacyImplementation={true}
         renderItem={call}
       />
-      {vis && (
-        <ActivityIndicator
-          size="large"
-          style={{
-            alignSelf: "center",
-            width: "100%",
-            backgroundColor: data.darkmode
-              ? colors.dark.lightblack
-              : colors.light.background,
-          }}
-        />
-      )}
     </Modal>
   );
 };

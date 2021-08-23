@@ -10,7 +10,7 @@ import colors from "../content/colors";
 import { info } from "../redux/reducer";
 import Appmodal from "./Appmodal";
 
-const Appbottomsheet = ({ visible, setvisisble, rec, sender }) => {
+const Appbottomsheet = ({ visible, setvisible, rec, sender }) => {
   const nav = useNavigation();
   const data = useSelector(info);
   const [i, setI] = useState(null);
@@ -37,20 +37,7 @@ const Appbottomsheet = ({ visible, setvisisble, rec, sender }) => {
           setvisible={(i) => setVis(i)}
           info={i}
           origin={origin}
-          chosen={(e) => {
-            backendfuncs.send(
-              {
-                name: e?.name,
-                number: e?.phoneNumbers[0].number,
-                image: e?.imageAvailable && e?.image,
-              },
-              "contact",
-              rec,
-              sender
-            );
-            setvisisble(false);
-            setVis(false);
-          }}
+          chosen={"contact"}
         />
         {bottomsheetdata.map((l, i) => (
           <TouchableHighlight
@@ -65,8 +52,8 @@ const Appbottomsheet = ({ visible, setvisisble, rec, sender }) => {
                 (i) => setI(i),
                 (i) => setOrigin(i)
               );
-              if (l.title === "Contact") return setVis(true);
-              return setvisisble(false);
+              if (l.title === "Contacts") return setVis(true);
+              return setvisible(false);
             }}
             style={
               l.title === "Contacts"
@@ -121,7 +108,7 @@ const Appbottomsheet = ({ visible, setvisisble, rec, sender }) => {
         ))}
       </View>
       <ListItem
-        onPress={() => setvisisble()}
+        onPress={()=>setvisible(false)}
         containerStyle={{
           backgroundColor: data.darkmode
             ? colors.dark.black

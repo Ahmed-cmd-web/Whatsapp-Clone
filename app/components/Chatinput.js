@@ -31,7 +31,6 @@ const Chatinput = (user) => {
   const [flex, setflex] = useState(0.7);
   const [text, settext] = useState("");
   const keyboard = useKeyboard();
-
   useEffect(() => {
     LayoutAnimation.easeInEaseOut();
     backendfuncs.settyping(
@@ -46,7 +45,7 @@ const Chatinput = (user) => {
   return (
     <KeyboardAvoidingView
       keyboardVerticalOffset={Platform.OS === "android" || landscape ? 40 : 70}
-      behavior={Platform.OS === "android" ? "height" : "padding"}
+      behavior={Platform.OS === "android" ? "height" : "padding"} 
     >
       <View
         style={[
@@ -126,7 +125,7 @@ const Chatinput = (user) => {
         {!text.length > 0 && <Appmic />}
         <Appbottomsheet
           visible={visible}
-          setvisisble={() => setvisible(false)}
+          setvisible={(e) => setvisible(e)}
           rec={user?.user}
           sender={data}
         />
