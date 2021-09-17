@@ -1,7 +1,13 @@
 /** @format */
 
 import React from "react";
-import { SafeAreaView, StyleSheet, Text, TouchableHighlight, View } from "react-native";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  View,
+} from "react-native";
 import { Icon } from "react-native-elements";
 import { Switch } from "react-native-elements";
 import { useSelector } from "react-redux";
@@ -9,9 +15,9 @@ import colors from "../content/colors";
 import { info } from "../redux/reducer";
 
 const Applist = ({
-  icon,
+  icon = null,
   size = 20,
-  type,
+  type=null,
   bg = colors.light.tea,
   title,
   isswitch = false,
@@ -42,15 +48,19 @@ const Applist = ({
         },
       ]}
     >
-      <SafeAreaView style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+      <SafeAreaView
+        style={{ flexDirection: "row", alignItems: "center", flex: 1 }}
+      >
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
-          <Icon
-            name={icon}
-            size={size}
-            type={type}
-            color={"white"}
-            style={[styles.icon, { backgroundColor: bg }]}
-          />
+          {icon && (
+            <Icon
+              name={icon}
+              size={size}
+              type={type}
+              color={"white"}
+              style={[styles.icon, { backgroundColor: bg }]}
+            />
+          )}
           <Text
             style={{
               left: 5,

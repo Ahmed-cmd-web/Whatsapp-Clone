@@ -2,52 +2,27 @@
 
 import { Camera } from "expo-camera";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableHighlight, View } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import Loading from "./Loading";
-import backendfuncs from "../backend/backendfuncs";
 import colors from "../content/colors";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { StatusBar } from "expo-status-bar";
 import { useDeviceOrientation } from "@react-native-community/hooks";
 
-const Cam = ({ navigation }) => {
+const Cam = ({ navigation, backto = null }) => {
   const ref = useRef();
-  const [video, setvideo] = useState(null);
-  const [pic, setpic] = useState(null);
   const [type, settype] = useState(Camera.Constants.Type.back);
   const [loading, setLoading] = useState(false);
-  const [mounted, setmounted] = useState(false);
   const [status, setStatus] = useState("light");
   const or = async () =>
     await ScreenOrientation.lockAsync(
       ScreenOrientation.OrientationLock.PORTRAIT_UP
     );
   const { landscape, portrait } = useDeviceOrientation();
-
-  useEffect(() => {
-    setmounted(true);
-    if (mounted) {
-      setLoading(false);
-      if (video || pic) {
-        setvideo(null);
-        setpic(null);
-        navigation.navigate("Video", {
-          viduri: video,
-          pic: pic,
-        });
-      }
-      setmounted(false);
-    }
-  }, [video, pic]);
 
   useEffect(() => {
     or();
@@ -64,7 +39,7 @@ const Cam = ({ navigation }) => {
         onPress={async () => {
           await ScreenOrientation.unlockAsync();
           setStatus("auto");
-          navigation.goBack();
+          backto ? navigation.navigate(backto) : navigation.goBack();
         }}
       />
       <Camera
@@ -86,30 +61,6 @@ const Cam = ({ navigation }) => {
       >
         <FontAwesome name="photo" size={35} color={colors.light.white} />
         <TouchableHighlight
-          onLongPress={() => {
-            setStatus("auto");
-            backendfuncs.takephotoorvid(
-              "video",
-              (e, i) => {
-                setvideo(e);
-                setLoading(i);
-              },
-              ref
-            );
-          }}
-          onHideUnderlay={async () => ref.current.stopRecording()}
-          delayPressIn={1000}
-          onPress={() => {
-            setStatus("auto");
-            backendfuncs.takephotoorvid(
-              "photo",
-              (e, i) => {
-                setpic(e);
-                setLoading(i);
-              },
-              ref
-            );
-          }}
           style={{ borderRadius: 55, bottom: -20 }}
           activeOpacity={0.8}
           underlayColor={colors.light.red}

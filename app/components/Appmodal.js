@@ -8,7 +8,6 @@ import {
   View,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator,
 } from "react-native";
 import { SearchBar } from "react-native-elements";
 import { useSelector } from "react-redux";
@@ -131,7 +130,7 @@ const Appmodal = ({
         }}
         onEndReached={() => {
           if (!load) return;
-          setSize(size + 10);
+          setSize(size + 20);
           backendfuncs.handle(
             (i) => setorigin(i),
             (i) => setinfo(i),

@@ -1,17 +1,28 @@
 /** @format */
 
-import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import React, { useRef } from "react";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Tooltip } from "react-native-elements";
 import { useSelector } from "react-redux";
 import colors from "../content/colors";
 import { info } from "../redux/reducer";
 import Messagecontact from "./Messagecontact";
 import Messagemap from "./Messagemap";
-
-const Appmessageitem = ({ message, timestamp, who, type }) => {
+import { AntDesign } from "@expo/vector-icons";
+import backendfuncs from "../backend/backendfuncs";
+import { useRoute } from "@react-navigation/core";
+const Appmessageitem = ({ message, timestamp, who, type, id }) => {
   const data = useSelector(info);
+  const ref = useRef();
+  const route = useRoute();
   var time = new Date(timestamp?.seconds * 1000).toUTCString();
-  var d = new Date(timestamp?.seconds * 1000);
   var timeRegex = /(\d\d):(\d\d):(\d\d)/;
   const newtime =
     timeRegex.exec(time)[1] >= 12
@@ -49,16 +60,12 @@ const Appmessageitem = ({ message, timestamp, who, type }) => {
           </View>
         );
       case "location":
-        return (
-         <Messagemap message={message} />
-        );
+        return <Messagemap message={message} />;
       case "contact":
         return (
           <Messagecontact
             message={message}
-            color={
-              data.darkmode ? colors.light.black : colors.light.background
-            }
+            color={data.darkmode ? colors.light.black : colors.light.background}
             text={data.darkmode ? colors.light.white : colors.dark.black}
           />
         );
@@ -68,7 +75,7 @@ const Appmessageitem = ({ message, timestamp, who, type }) => {
     }
   };
   return (
-    <View
+    <TouchableOpacity
       style={[
         styles.con,
         {
@@ -85,40 +92,93 @@ const Appmessageitem = ({ message, timestamp, who, type }) => {
           right: who === "sent" ? 10 : undefined,
         },
       ]}
+      onLongPress={() => {
+        who === "sent" ? ref.current.toggleTooltip() : null;
+      }}
+      delayLongPress={500}
     >
-      <View style={styles.d}>
-        {which(type)}
-        <Text
+      <Tooltip
+        ref={ref}
+        withOverlay={false}
+        backgroundColor={colors.light.background}
+        width={100}
+        toggleOnPress={false}
+        popover={
+          <TouchableOpacity
+            style={{
+              flexDirection: "row",
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "space-evenly",
+              width: "100%",
+            }}
+            onPress={() =>
+              Alert.alert(
+                "Warning",
+                "Are you sure you want to delete this message?\nThis message will be deleted for you only.",
+                [
+                  {
+                    text: "No",
+                    onPress: () => null,
+                  },
+                  {
+                    text: "Yes",
+                    onPress: () => {
+                      backendfuncs.deletemessage(
+                        data?.user[0]?.number,
+                        route?.params?.number,
+                        id
+                      );
+                      ref.current.toggleTooltip();
+                    },
+                  },
+                ]
+              )
+            }
+          >
+            <AntDesign name="delete" size={20} color={colors.light.red} />
+            <Text style={{ color: colors.light.red, fontSize: 15 }}>
+              Delete
+            </Text>
+          </TouchableOpacity>
+        }
+      >
+        <View style={styles.d}>
+          {which(type)}
+          <Text
+            style={[
+              styles.time,
+              {
+                color:
+                  type === "image"
+                    ? colors.light.white
+                    : colors.light.lightgrey,
+              },
+            ]}
+          >
+            {newtime}
+          </Text>
+        </View>
+        <View
           style={[
-            styles.time,
+            styles.tip,
             {
-              color:
-                type === "image" ? colors.light.white : colors.light.lightgrey,
+              borderTopColor:
+                who === "sent"
+                  ? data.darkmode
+                    ? colors.light.darktea
+                    : colors.light.ChatBubble
+                  : data.darkmode
+                  ? colors.dark.black
+                  : colors.light.white,
+              left: who === "sent" ? undefined : -5,
+              right: who === "sent" ? -5 : undefined,
+              transform: [{ rotate: who === "sent" ? "270deg" : "180deg" }],
             },
           ]}
-        >
-          {newtime}
-        </Text>
-      </View>
-      <View
-        style={[
-          styles.tip,
-          {
-            borderTopColor:
-              who === "sent"
-                ? data.darkmode
-                  ? colors.light.darktea
-                  : colors.light.ChatBubble
-                : data.darkmode
-                ? colors.dark.black
-                : colors.light.white,
-            left: who === "sent" ? undefined : -5,
-            right: who === "sent" ? -5 : undefined,
-            transform: [{ rotate: who === "sent" ? "270deg" : "180deg" }],
-          },
-        ]}
-      ></View>
-    </View>
+        ></View>
+      </Tooltip>
+    </TouchableOpacity>
   );
 };
 

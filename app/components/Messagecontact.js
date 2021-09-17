@@ -18,6 +18,7 @@ const Messagecontact = ({ message, color, text }) => {
       alignItems: "center",
       flexDirection: "row",
       justifyContent: "space-between",
+      padding: 5,
     },
     text: { color: text },
   });
@@ -43,9 +44,11 @@ const Messagecontact = ({ message, color, text }) => {
             }}
           />
         )}
-        <Text style={styles.text}>{message.name}</Text>
+        <View style={{alignItems:'center'}}>
+          <Text style={styles.text}>{message.name}</Text>
+          <Text style={styles.text}>{message.number}</Text>
+        </View>
       </View>
-      <Text style={[styles.text, { top: 5 }]}>{message.number}</Text>
     </View>
   );
 };

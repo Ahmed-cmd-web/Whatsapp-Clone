@@ -1,7 +1,7 @@
 /** @format */
 
 import React from "react";
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Cam from "../components/Cam";
 import { Icon } from "react-native-elements";
@@ -14,6 +14,7 @@ import { info } from "../redux/reducer";
 import Chatsscreen from "../screens/Chatsscreen";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
+import Settingsstack from "./Settingsstack";
 
 const Apptabs = () => {
   const Tabs = createBottomTabNavigator();
@@ -63,7 +64,6 @@ const Apptabs = () => {
 
       <Tabs.Screen
         name="Camera"
-        component={Cam}
         options={{
           tabBarVisible: false,
           tabBarBadgeStyle: { marginHorizontal: 10 },
@@ -77,7 +77,9 @@ const Apptabs = () => {
             />
           ),
         }}
-      />
+      >
+        {({ navigation }) => <Cam backto={"Chats"} navigation={navigation} />}
+      </Tabs.Screen>
       <Tabs.Screen
         name="Chats"
         component={Chatsscreen}
@@ -89,7 +91,7 @@ const Apptabs = () => {
       />
       <Tabs.Screen
         name="Settings"
-        component={Settings}
+        component={Settingsstack}
         options={{
           tabBarIcon: ({ size, color }) => (
             <Icon

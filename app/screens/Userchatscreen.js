@@ -14,6 +14,7 @@ import Appmessages from "../components/Appmessages";
 import Chatinput from "../components/Chatinput";
 import Loading from "../components/Loading";
 import { info, setsent } from "../redux/reducer";
+import { Audio } from "expo-av";
 import * as ScreenOrientation from "expo-screen-orientation";
 import {
   useAppState,
@@ -27,6 +28,7 @@ const Userchatscreen = ({ route }) => {
   const [loading, setLoading] = useState(false);
   const [mes, setMes] = useState([]);
   const current = useAppState();
+  const [sound, setSound] = useState(null);
   const or = async () => await ScreenOrientation.unlockAsync();
   useEffect(() => {
     let mount = true;
@@ -65,6 +67,7 @@ const Userchatscreen = ({ route }) => {
         data: mes,
       })
     );
+    play();
   }, [mes, sent]);
   useEffect(() => {
     if (current === "inactive" || current === "background") {
@@ -73,6 +76,16 @@ const Userchatscreen = ({ route }) => {
     }
     return;
   }, [current]);
+  const play = async () => {
+    const { sound } = await Audio.Sound.createAsync(
+      require("../assets/Soundeffect.mp3")
+    );
+    setSound(sound);
+    await sound.playAsync();
+  };
+  useEffect(() => {
+    return sound ? () => sound.unloadAsync() : undefined;
+  }, [sound]);
   return (
     <View style={styles.con}>
       <Loading visible={loading} />

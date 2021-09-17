@@ -56,7 +56,7 @@ const Appcontactitem = ({
       {item.imageAvailable ? (
         <Avatar
           source={{
-            uri: item.image,
+            uri: item?.image?.uri,
           }}
           rounded={true}
           size={55}

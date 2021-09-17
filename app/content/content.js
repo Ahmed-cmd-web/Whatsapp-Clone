@@ -9,5 +9,7 @@ export default {
   errormessageifdoesnotexist: "This user does not exist",
   chatstitle: "Chats",
   newchattitle: "New Chat",
+  originalnumberplaceholder: "Original Phone Number",
+  changeaccountinfobuttontitle: "Update",
   globalfontsize: 18,
 };

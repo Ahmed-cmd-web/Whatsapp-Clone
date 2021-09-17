@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import {
   Platform,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -17,7 +16,6 @@ import { Avatar } from "react-native-elements";
 import colors from "../content/colors";
 import { useDispatch, useSelector } from "react-redux";
 import Cam from "../components/Cam";
-import Appvideo from "../components/Appvideo";
 import { Icon } from "react-native-elements";
 import { clearchats, info } from "../redux/reducer";
 import Apptabs from "./Apptabs";
@@ -29,12 +27,11 @@ const Stack = createStackNavigator();
 const Chatsstack = () => {
   const dispatch = useDispatch();
   const data = useSelector(info);
-  const [typing, setTyping] = useState(false);
+  const [typing, setTyping] = useState({});
   const { landscape } = useDeviceOrientation();
   useEffect(() => {
     backendfuncs.checktyping((e) => setTyping(e), data?.user[0]?.number);
   }, []);
-
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -88,7 +85,6 @@ const Chatsstack = () => {
           headerLeft: () => {
             const navigation = useNavigation();
             const route = useRoute();
-
             return (
               <Icon
                 name="chevron-back"
@@ -156,7 +152,9 @@ const Chatsstack = () => {
                       color: colors.light.grey,
                     }}
                   >
-                    {typing ? "typing..." : route.params.number}
+                    {typing[route.params.number]
+                      ? "typing..."
+                      : route.params.number}
                   </Text>
                 </View>
               </TouchableOpacity>
@@ -170,16 +168,9 @@ const Chatsstack = () => {
         options={{ headerShown: false }}
         component={Cam}
       />
-      <Stack.Screen
-        name="Video"
-        component={Appvideo}
-        options={{ headerShown: false }}
-      />
       <Stack.Screen name="Map" component={Appmap} />
     </Stack.Navigator>
   );
 };
 
 export default Chatsstack;
-
-const styles = StyleSheet.create({});

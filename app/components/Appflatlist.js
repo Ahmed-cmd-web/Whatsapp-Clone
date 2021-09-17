@@ -1,15 +1,31 @@
 /** @format */
 
+import { useNavigation } from "@react-navigation/core";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import backendfuncs from "../backend/backendfuncs";
 import { clear, info, setdarkmode, setwallpaper } from "../redux/reducer";
 import Applist from "./Applist";
 
 const Appflatlist = ({ data }) => {
   const dispatch = useDispatch();
   const { darkmode } = useSelector(info);
+  const { navigate } = useNavigation();
+  const whattodo = async (press) => {
+    switch (press) {
+      case "clear":
+        dispatch(clear());
+        break;
+      case "change":
+        navigate("Chat Wallpaper");
+        break;
+      case "Update":
+        navigate("Account");
+        break;
+      default:
+        break;
+    }
+  };
   return (
     <View>
       {data.map((item, index) => (
@@ -24,23 +40,11 @@ const Appflatlist = ({ data }) => {
           valuechanged={
             item.isswitch
               ? (e) => {
-                  
                   dispatch(setdarkmode(e));
                 }
               : () => null
           }
-          onpress={
-            item.onpress === "clear"
-              ? () => dispatch(clear())
-              : async () => {
-                  try {
-                    const res = await backendfuncs.imageselector();
-                    dispatch(setwallpaper(res.uri));
-                  } catch (error) {
-                    console.log(error);
-                  }
-                }
-          }
+          onpress={() => whattodo(item.onpress)}
         />
       ))}
     </View>
@@ -48,5 +52,3 @@ const Appflatlist = ({ data }) => {
 };
 
 export default Appflatlist;
-
-const styles = StyleSheet.create({});

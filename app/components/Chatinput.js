@@ -45,7 +45,7 @@ const Chatinput = (user) => {
   return (
     <KeyboardAvoidingView
       keyboardVerticalOffset={Platform.OS === "android" || landscape ? 40 : 70}
-      behavior={Platform.OS === "android" ? "height" : "padding"} 
+      behavior={Platform.OS === "android" ? "height" : "padding"}
     >
       <View
         style={[
@@ -119,7 +119,7 @@ const Chatinput = (user) => {
             />
           </TouchableOpacity>
         ) : (
-          <Appcamicon />
+          <Appcamicon reciever={user?.user} sender={data} />
         )}
 
         {!text.length > 0 && <Appmic />}

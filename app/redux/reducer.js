@@ -20,10 +20,17 @@ const reducer = createSlice({
     },
     setchats: (state, action) => {
       state.chats = [...state.chats, action.payload];
+      state.chats = state.chats.filter(
+        (e, i, a) => i === a.findIndex((t) => t.data.number === e.data.number)
+      );
       return state;
     },
     deletechat: (state, action) => {
       state.chats = state.chats.filter((e) => e.data.number !== action.payload);
+      return state;
+    },
+    clearchatbody: (state) => {
+      state.chats = [];
       return state;
     },
     setrecieved: (state, action) => {
@@ -60,6 +67,10 @@ const reducer = createSlice({
       state.wallpaper = action.payload;
       return state;
     },
+    resetwallpaper: (state) => {
+      state.wallpaper = null;
+      return state;
+    },
     clear: (state) => {
       state = {
         user: [],
@@ -81,7 +92,9 @@ export const {
   deletechat,
   setwallpaper,
   setnav,
+  clearchatbody,
   setdarkmode,
+  resetwallpaper,
 } = reducer.actions;
 export const info = (state) => state;
 export default reducer.reducer;

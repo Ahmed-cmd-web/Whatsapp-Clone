@@ -42,12 +42,23 @@ const register = async (v, setloading) => {
               data: v,
             };
           })
-          .catch((e) =>
+          .catch((e) => {
+            console.log(e);
             Alert.alert(
               "Warning",
-              "Internet connection is not stable.\n Try again later."
-            )
-          );
+              "Internet connection is not stable.\n Try again later.",
+              [
+                {
+                  text: "ok",
+                  onPress: () => setloading(false),
+                },
+              ]
+            );
+
+            return {
+              ok: false,
+            };
+          });
       }
       return {
         ok: false,
@@ -67,7 +78,13 @@ const register = async (v, setloading) => {
   } catch (error) {
     Alert.alert(
       "Warning",
-      "Internet connection is not stable.\n Try again later."
+      "Internet connection is not stable.\n Try again later.",
+      [
+        {
+          text: "ok",
+          onPress: () => setloading(false),
+        },
+      ]
     );
   }
 };
@@ -108,7 +125,7 @@ const handlesearch = (e, setvalue, origin, setinfo) => {
   );
 };
 
-const handle = async (setorigin, setinfo, size = 10) => {
+const handle = async (setorigin, setinfo, size = 15) => {
   try {
     const { granted } = await Contacts.requestPermissionsAsync();
     if (!granted) return;
@@ -181,29 +198,16 @@ const takeaudiopermission = async () => {
   }
 };
 
-const takephotoorvid = async (type, set, ref) => {
+const takephotoorvid = async (set) => {
   try {
-    switch (type) {
-      case "video":
-        const vid = await ref.current.recordAsync({
-          quality: 1,
-          base64: true,
-        });
-        return set(vid.uri, true);
-
-      case "photo":
-        const pic = await ref.current.takePictureAsync({
-          quality: 1,
-          base64: true,
-          exif: true,
-        });
-        return set(pic, true);
-      default:
-        return Alert.alert(
-          "Not found",
-          'This type of operation doesnot exist.Select either "video" or "photo" '
-        );
-    }
+    const pic = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+      base64: true,
+    });
+    if (pic.cancelled) return;
+    return set(pic.base64);
   } catch (error) {
     console.log(error);
   }
@@ -274,14 +278,28 @@ const getdata = async (data, route, setLoading, recieved, sent) => {
     )
       .orderBy("timestamp")
       .onSnapshot((snapshot) => {
-        sent(snapshot.docs.map((i) => i.data()));
+        sent(
+          snapshot.docs.map((i) => {
+            return {
+              id: i.id,
+              ...i.data(),
+            };
+          })
+        );
       });
     db.collection(
       `users/${data?.user[0].number}/chats/${route?.params?.number}/recieved`
     )
       .orderBy("timestamp")
       .onSnapshot((snapshot) => {
-        recieved(snapshot.docs.map((i) => i.data()));
+        recieved(
+          snapshot.docs.map((i) => {
+            return {
+              id: i.id,
+              ...i.data(),
+            };
+          })
+        );
         setLoading(false);
       });
     return;
@@ -298,21 +316,30 @@ const getlocation = async () => {
   }
 };
 const getusers = async (setOverlay, user, setchats) => {
-  setOverlay(true);
-  db.collection(`users/${user}/chats`).onSnapshot((querySnapshot) => {
-    if (querySnapshot.empty) return setOverlay(false);
-    querySnapshot.docChanges().forEach(async (i) => {
-      if (i.type === "modified") return;
-      await db
-        .doc(`users/${i.doc.id}`)
-        .get()
-        .then(async (i) => {
-          setchats({ data: i.data(), sent: [], recieved: [] });
-          setOverlay(false);
-        })
-        .catch((e) => console.log(e));
+  try {
+    setOverlay(true);
+    db.collection(`users/${user}/chats`).onSnapshot((querySnapshot) => {
+      if (querySnapshot.empty) return setOverlay(false);
+      querySnapshot.docChanges().forEach(async (i) => {
+        if (i.type === "modified") return;
+        if (i.type === "removed") return;
+        await db
+          .doc(`users/${i.doc.id}`)
+          .get()
+          .then(async (i) => {
+            setchats({ data: i.data(), sent: [], recieved: [] });
+            setOverlay(false);
+          })
+          .catch((e) => {
+            setOverlay(false);
+            console.log(e);
+          });
+      });
     });
-  });
+  } catch (error) {
+    setOverlay(false);
+    console.log(error);
+  }
 };
 const imageselector = async () => {
   if (Platform.OS !== "web") {
@@ -339,9 +366,90 @@ const settyping = async (istyping, reciever, sender) => {
 };
 const checktyping = async (set, user) => {
   try {
-    db.collection(`users/${user}/chats`).onSnapshot((e) =>
-      e.forEach((i) => set(i.data().typing))
-    );
+    db.collection(`users/${user}/chats`).onSnapshot((e) => {
+      let obj = {};
+      e.forEach((i) => {
+        obj[i.id] = i.data().typing;
+      });
+      set(obj);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+const updateuser = async (target, newdata, setloading) => {
+  try {
+    setloading(true);
+    const res = await getbookednums();
+    if (!res) {
+      Alert.alert("An error ocurred", "try again", [
+        {
+          text: "ok",
+          onPress: () => {
+            setloading(false);
+          },
+        },
+      ]);
+      return {
+        ok: false,
+      };
+    }
+    if (!(target.indexOf(" ") >= 0) && /^[0-9]+$/.test(target)) {
+      if (
+        res.findIndex((i) => {
+         
+
+          return i === target;
+        }) !== -1
+      ) {
+        await db.doc(`users/${target}`).set(newdata);
+        return {
+          ok: true,
+        };
+      }
+      {
+        Alert.alert("Warning", "This user doesnot exist.", [
+          {
+            text: "ok",
+            onPress: () => {
+              setloading(false);
+            },
+          },
+        ]);
+        return {
+          ok: false,
+        };
+      }
+    }
+    {
+      Alert.alert(
+        "Warning",
+        "Remove all spaces in the number field and check the number is written in English.",
+        [
+          {
+            text: "ok",
+            onPress: () => {
+              setloading(false);
+            },
+          },
+        ]
+      );
+      return {
+        ok: false,
+      };
+    }
+  } catch (error) {
+    setloading(false);
+    console.log(error);
+    return {
+      ok: false,
+    };
+  }
+};
+const deletemessage = async (user, reciever, sentmessageid) => {
+  try {
+ await db.doc(`users/${user}/chats/${reciever}/sent/${sentmessageid}`).delete();
+
   } catch (error) {
     console.log(error);
   }
@@ -367,4 +475,6 @@ export default {
   imageselector,
   checktyping,
   getusers,
+  updateuser,
+  deletemessage
 };

@@ -1,6 +1,6 @@
 /** @format */
 
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { ScrollView, StyleSheet, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Appmessageitem from "./Appmessageitem";
@@ -13,6 +13,19 @@ const Appmessages = ({ sent, recieved }) => {
     mes.sort((a, b) => a.data.timestamp.seconds - b.data.timestamp.seconds);
     setmessages(mes);
   }, [sent, recieved]);
+  const final = useCallback(
+    (i, e) => (
+      <Appmessageitem
+        message={i.data.message}
+        timestamp={i.data.timestamp}
+        key={e}
+        who={i.who}
+        type={i.data.type}
+        id={i.data.id}
+      />
+    ),
+    [messages]
+  );
   const ref = useRef();
   return (
     <ScrollView
@@ -20,18 +33,9 @@ const Appmessages = ({ sent, recieved }) => {
       contentContainerStyle={{ alignItems: "center" }}
       style={styles.con}
       onContentSizeChange={() => ref.current.scrollToEnd()}
+      keyboardShouldPersistTaps='always'
     >
-      <SafeAreaView style={styles.con2}>
-        {messages.map((i, e) => (
-          <Appmessageitem
-            message={i.data.message}
-            timestamp={i.data.timestamp}
-            key={e}
-            who={i.who}
-            type={i.data.type}
-          />
-        ))}
-      </SafeAreaView>
+      <SafeAreaView style={styles.con2}>{messages.map(final)}</SafeAreaView>
     </ScrollView>
   );
 };

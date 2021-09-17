@@ -5,11 +5,11 @@ import { StyleSheet, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import colors from "./app/content/colors";
 import { info, setnav } from "./app/redux/reducer";
-import Accountscreen from "./app/screens/Accountscreen";
 import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import Chatsstack from "./app/navigation/Chatsstack";
 import { LogBox } from "react-native";
+import Accountstack from "./app/navigation/Accountstack";
 
 LogBox.ignoreLogs(["Setting a timer"]);
 
@@ -34,7 +34,9 @@ const Index = () => {
       ]}
     >
       {nouser ? (
-        <Accountscreen token={null} />
+        <NavigationContainer>
+          <Accountstack />
+        </NavigationContainer>
       ) : (
         <NavigationContainer
           onStateChange={(s) =>
@@ -49,6 +51,7 @@ const Index = () => {
       <StatusBar style={data.darkmode ? "light" : "dark"} />
     </View>
   );
+
 };
 
 export default Index;

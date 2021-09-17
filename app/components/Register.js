@@ -28,7 +28,7 @@ const Register = ({ token }) => {
   });
   const dispatch = useDispatch();
   return (
-    <View style={{ flex: 1, marginVertical: 10, paddingHorizontal: 10 }}>
+    <View style={{ flex: 1, margin: 10, justifyContent: "center" }}>
       <Loading visible={loading} />
       <Appformik
         schema={schema}
@@ -36,7 +36,6 @@ const Register = ({ token }) => {
           name: "",
           number: "",
           profilepic: "",
-          token: token,
         }}
         submit={async (v) => {
           setLoading(true);
@@ -54,6 +53,8 @@ const Register = ({ token }) => {
               return dispatch(setuser(res.data));
             }
           } catch (error) {
+            setLoading(false);
+
             console.log(error);
           }
         }}

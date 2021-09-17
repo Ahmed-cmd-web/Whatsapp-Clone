@@ -12,7 +12,7 @@ const Appavatar = ({ name }) => {
   const handlepress = async () => {
     try {
       const { granted } = await ImagePicker.requestCameraPermissionsAsync();
-      if (!granted) return console.log("permission denied");
+      if (!granted) return;
       const selected = await ImagePicker.launchImageLibraryAsync({
         quality: 0.5,
         mediaTypes: ImagePicker.MediaTypeOptions.Images,

@@ -12,18 +12,17 @@ import { info as i } from "../redux/reducer";
 import Appmodal from "./Appmodal";
 import { useNetInfo } from "@react-native-community/netinfo";
 import Offline from "./Offline";
+import { TouchableOpacity } from "react-native-gesture-handler";
 const Appheader = () => {
   const [vis, setvis] = useState(false);
   const [origin, setorigin] = useState();
   const [info, setinfo] = useState();
-  const [internet, setInternet] = useState(
-    type !== "none" && type !== "unknown"
-  );
+  const [internet, setInternet] = useState(isInternetReachable);
   const data = useSelector(i);
-  const { type } = useNetInfo();
+  const { type, isInternetReachable } = useNetInfo();
   useEffect(() => {
-    setInternet(type !== "none" && type !== "unknown");
-  }, [type]);
+    setInternet(isInternetReachable);
+  }, [type, isInternetReachable]);
   return (
     <React.Fragment>
       <Header
@@ -55,21 +54,23 @@ const Appheader = () => {
           )
         }
         rightComponent={
-          <FontAwesome
-            name="pencil-square-o"
-            size={20}
-            color={colors.light.CheckmarkBlue}
+          <TouchableOpacity
             onPress={() => {
               if (!internet)
                 return Alert.alert("Warning", "No internet connection");
               setvis(true);
               backendfuncs.handle(
                 (i) => setorigin(i),
-                (i) => setinfo(i),
-              
+                (i) => setinfo(i)
               );
             }}
-          />
+          >
+            <FontAwesome
+              name="pencil-square-o"
+              size={20}
+              color={colors.light.CheckmarkBlue}
+            />
+          </TouchableOpacity>
         }
       />
       <Appmodal

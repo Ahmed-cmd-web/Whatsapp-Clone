@@ -26,7 +26,7 @@ const Login = () => {
 
   const dispatch = useDispatch();
   return (
-    <View style={{ flex: 1, margin: 10 }}>
+    <View style={{ flex: 1,marginHorizontal:10,justifyContent:'center' }}>
       <Loading visible={loading} />
       <Appformik
         initialvalues={{

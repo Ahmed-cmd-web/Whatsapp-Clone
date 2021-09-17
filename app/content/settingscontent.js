@@ -22,6 +22,7 @@ export default [
       type: "font-awesome-5",
       bg: colors.light.CheckmarkBlue,
       title: "Account",
+      onpress:'Update'
     },
     {
       icon: "whatsapp",
