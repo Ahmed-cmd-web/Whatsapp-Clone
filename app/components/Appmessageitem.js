@@ -159,25 +159,25 @@ const Appmessageitem = ({ message, timestamp, who, type, id }) => {
             {newtime}
           </Text>
         </View>
-        <View
-          style={[
-            styles.tip,
-            {
-              borderTopColor:
-                who === "sent"
-                  ? data.darkmode
-                    ? colors.light.darktea
-                    : colors.light.ChatBubble
-                  : data.darkmode
-                  ? colors.dark.black
-                  : colors.light.white,
-              left: who === "sent" ? undefined : -5,
-              right: who === "sent" ? -5 : undefined,
-              transform: [{ rotate: who === "sent" ? "270deg" : "180deg" }],
-            },
-          ]}
-        ></View>
       </Tooltip>
+      <View
+        style={[
+          styles.tip,
+          {
+            borderTopColor:
+              who === "sent"
+                ? data.darkmode
+                  ? colors.light.darktea
+                  : colors.light.ChatBubble
+                : data.darkmode
+                ? colors.dark.black
+                : colors.light.white,
+            left: who === "sent" ? undefined : -5,
+            right: who === "sent" ? -5 : undefined,
+            transform: [{ rotate: who === "sent" ? "270deg" : "180deg" }],
+          },
+        ]}
+      ></View>
     </TouchableOpacity>
   );
 };
